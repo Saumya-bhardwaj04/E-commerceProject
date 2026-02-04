@@ -15,7 +15,7 @@ function App() {
     async function getData() {
         setIsLoading(true);
         try {
-            let res = await fetch("https://dummyjson.com/products");
+            let res = await fetch(import.meta.env.VITE_PRODUCTS_API);
             let data = await res.json();
             setFilterData(data.products);
             setinitialData(data.products);
@@ -65,7 +65,7 @@ function App() {
             <header className="w-full py-4 px-4 md:py-6 flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto">
                 <div className="text-center md:text-left mb-4 md:mb-0">
                     <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight">
-                        Sasta Sundar Tikau
+                        Pocket Cart
                     </h1>
                     <p className="text-slate-400 mt-1 text-xs md:text-sm">
                         Wallet khush, dil khush!
@@ -200,6 +200,7 @@ function App() {
             {/* Cart Sidebar */}
             {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}
         </div>
+        
     );
 }
 

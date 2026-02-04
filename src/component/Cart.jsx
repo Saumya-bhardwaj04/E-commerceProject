@@ -1,7 +1,13 @@
 import { useCart } from "../context/CartContext";
+import toast from "react-hot-toast";
 
 function Cart({ onClose }) {
     const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart();
+    function handleCheckout() {
+        toast.success("Comming Soon! Checkout feature is under development.😅");
+        clearCart();
+        onClose();
+    }
 
     return (
         <div className="fixed inset-0 z-50 overflow-hidden">
@@ -154,7 +160,7 @@ function Cart({ onClose }) {
 
                         {/* Actions */}
                         <div className="flex flex-col gap-2">
-                            <button className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full transition-all duration-200 active:scale-95">
+                            <button onClick={handleCheckout} className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full transition-all duration-200 active:scale-95">
                                 Checkout
                             </button>
                             <button
