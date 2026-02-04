@@ -193,7 +193,7 @@ function App() {
                         <p className="text-slate-500 mt-2">Try a different search term</p>
                     </div>
                 ) : (
-                    <AllCards data={filterData} />
+                    <AllCards data={filterData} onOpenCart={() => setIsCartOpen(true)} />
                 )}
             </main>
 

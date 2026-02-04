@@ -1,7 +1,12 @@
 import { useCart } from "../context/CartContext";
 
-function AllCards({ data }) {
+function AllCards({ data, onOpenCart }) {
     const { addToCart } = useCart();
+
+    function handleAddToCart(item) {
+        addToCart(item);
+        onOpenCart();
+    }
     return (
         <div className="mt-8 md:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 w-full max-w-7xl px-4 md:px-6">
             {data.map((singleItem) => (
@@ -61,7 +66,7 @@ function AllCards({ data }) {
                                 )}
                             </div>
                             <button 
-                                onClick={() => addToCart(singleItem)}
+                                onClick={() => handleAddToCart(singleItem)}
                                 className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 active:scale-95"
                             >
                                 Add to Cart
