@@ -1,12 +1,26 @@
-# React + Vite
+# Pocket Cart (Dynamic Data)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + Vite shopping UI that loads products from an API, lets you search and filter by category, and manages a cart with quantity controls.
 
-Currently, two official plugins are available:
+## Features
+- Fetches products from a live API
+- Search by product title and filter by category
+- Add to cart, update quantity, remove items, clear cart
+- Toasts for checkout feedback
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Setup
+1. Install dependencies: `npm install`
+2. Start dev server: `npm run dev`
 
-## Expanding the ESLint configuration
+## API
+The app reads the products API from `https://dummyjson.com/products` in [src/App.jsx].
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Scripts
+- `npm run dev` - start local dev server
+- `npm run build` - production build
+- `npm run preview` - preview production build
+
+## Tech Stack
+- React 19, Vite
+- Tailwind CSS
+- react-hot-toast
