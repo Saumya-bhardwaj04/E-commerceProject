@@ -3,15 +3,22 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import Razorpay from "razorpay";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import { createOrderRecord, getOrderRecord, updateOrderRecord } from "./store.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load local env file if present (Render provides env vars via dashboard)
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const PORT = Number(process.env.PORT || 5174);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 const allowedOrigins = CLIENT_ORIGIN.split(",")
     .map((s) => s.trim())
+    .map((s) => s.replace(/\/+$/, ""))
     .filter(Boolean);
 
 const keyId = process.env.RAZORPAY_KEY_ID;
@@ -33,7 +40,8 @@ app.use(
         origin(origin, callback) {
             // allow non-browser tools (no Origin header)
             if (!origin) return callback(null, true);
-            if (allowedOrigins.includes(origin)) return callback(null, true);
+            const normalized = String(origin).replace(/\/+$/, "");
+            if (allowedOrigins.includes(normalized)) return callback(null, true);
             return callback(new Error("Not allowed by CORS"));
         },
     })

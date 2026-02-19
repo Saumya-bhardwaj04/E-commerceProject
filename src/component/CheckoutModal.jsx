@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 
 const METHODS = [
-    { id: "paytm_upi", label: "Paytm (UPI)", type: "upi" },
-    { id: "gpay_upi", label: "Google Pay (UPI)", type: "upi" },
-    { id: "debit_card", label: "Debit Card", type: "card" },
-    { id: "credit_card", label: "Credit Card", type: "card" },
+    { id: "cards", label: "Cards", type: "card" },
+    { id: "netbanking", label: "Netbanking", type: "netbanking" },
+    { id: "wallet", label: "Wallet", type: "wallet" },
+    { id: "paylater", label: "Pay Later", type: "paylater" },
 ];
 
 function CheckoutModal({ onClose, onPay, totalAmount }) {
@@ -19,8 +19,8 @@ function CheckoutModal({ onClose, onPay, totalAmount }) {
 
     const formattedTotal = useMemo(() => {
         const amt = Number(totalAmount);
-        if (!Number.isFinite(amt)) return "$0.00";
-        return `$${amt.toFixed(2)}`;
+        if (!Number.isFinite(amt)) return "₹0.00";
+        return `₹${amt.toFixed(2)}`;
     }, [totalAmount]);
 
     async function handlePay() {
@@ -117,7 +117,7 @@ function CheckoutModal({ onClose, onPay, totalAmount }) {
                                 className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-60 disabled:active:scale-100"
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? "Opening..." : "Pay Now"}
+                                {isSubmitting ? "Processing..." : "Pay Now"}
                             </button>
                         </div>
 

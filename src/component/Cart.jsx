@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { apiJson } from "../lib/api";
 import { loadRazorpayCheckout } from "../lib/razorpay";
 import { addLocalOrderId } from "../lib/orders";
+import { formatInr } from "../lib/pricing";
 
 function Cart({ onClose }) {
     const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart();
@@ -24,6 +25,8 @@ function Cart({ onClose }) {
             id: it.id,
             title: it.title,
             price: it.price,
+            marketPrice: it.marketPrice,
+            discountPercentage: it.discountPercentage,
             quantity: it.quantity,
             thumbnail: it.thumbnail,
         }));
@@ -50,6 +53,12 @@ function Cart({ onClose }) {
             name: "Pocket Cart",
             description: "Order payment",
             order_id: orderCreate.razorpayOrderId,
+            method: {
+                card: selectedMethod?.id === "cards",
+                netbanking: selectedMethod?.id === "netbanking",
+                wallet: selectedMethod?.id === "wallet",
+                paylater: selectedMethod?.id === "paylater",
+            },
             handler: async (response) => {
                 try {
                     await apiJson("/api/payments/verify", {
@@ -169,8 +178,13 @@ function Cart({ onClose }) {
                                             {item.title}
                                         </h3>
                                         <p className="text-emerald-400 font-bold mt-1">
-                                            ${item.price}
+                                            {formatInr(item.price)}
                                         </p>
+                                        {Number(item.discountPercentage) > 0 && Number.isFinite(item.marketPrice) && (
+                                            <p className="text-slate-500 text-xs line-through">
+                                                {formatInr(item.marketPrice)}
+                                            </p>
+                                        )}
 
                                         {/* Quantity Controls */}
                                         <div className="flex items-center gap-2 mt-2">
@@ -228,7 +242,7 @@ function Cart({ onClose }) {
                         <div className="flex items-center justify-between">
                             <span className="text-slate-400">Total</span>
                             <span className="text-2xl font-bold text-white">
-                                ${cartTotal.toFixed(2)}
+                                {formatInr(cartTotal)}
                             </span>
                         </div>
 

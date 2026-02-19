@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import toast from "react-hot-toast";
+import { formatInr, getPricingFromProduct } from "../lib/pricing";
 
 function ProductDetails({ onOpenCart }) {
     const { id } = useParams();
@@ -95,6 +96,7 @@ function ProductDetails({ onOpenCart }) {
     }
 
     const primaryImage = product?.images?.[0] || product?.thumbnail;
+    const pricing = product ? getPricingFromProduct(product) : { marketPrice: 0, offerPrice: 0, discountPct: 0 };
 
     return (
         <main className="w-full flex-1 flex flex-col items-center pb-10 px-4">
@@ -164,10 +166,11 @@ function ProductDetails({ onOpenCart }) {
 
                             <div className="flex items-end justify-between gap-4 mt-6">
                                 <div>
-                                    <div className="text-3xl font-bold text-white">${product.price}</div>
-                                    {product.discountPercentage > 0 && (
+                                    <div className="text-3xl font-bold text-white">{formatInr(pricing.offerPrice)}</div>
+                                    {pricing.discountPct > 0 && (
                                         <div className="text-sm text-slate-400 mt-1">
-                                            {Math.round(product.discountPercentage)}% off
+                                            <span className="line-through">{formatInr(pricing.marketPrice)}</span>
+                                            <span className="ml-2">{Math.round(pricing.discountPct)}% off</span>
                                         </div>
                                     )}
                                 </div>

@@ -1,10 +1,33 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { getPricingFromProduct } from "../lib/pricing";
 
 const CartContext = createContext();
+const STORAGE_KEY = "pc_cart_items";
+
+function readStoredCartItems() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = JSON.parse(raw || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+}
 
 export function CartProvider({ children }) {
-    const [cartItems, setCartItems] = useState([]);
+    const [cartItems, setCartItems] = useState(() => {
+        if (typeof window === "undefined") return [];
+        return readStoredCartItems();
+    });
+
+    useEffect(() => {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cartItems));
+        } catch {
+            // ignore write errors (storage full / blocked)
+        }
+    }, [cartItems]);
 
     function addToCart(product) {
         setCartItems((prev) => {
@@ -16,7 +39,18 @@ export function CartProvider({ children }) {
                         : item
                 );
             }
-            return [...prev, { ...product, quantity: 1 }];
+
+            const { marketPrice, offerPrice, discountPct } = getPricingFromProduct(product);
+            return [
+                ...prev,
+                {
+                    ...product,
+                    marketPrice,
+                    discountPercentage: discountPct,
+                    price: offerPrice,
+                    quantity: 1,
+                },
+            ];
         });
     }
 

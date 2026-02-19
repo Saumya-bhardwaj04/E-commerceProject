@@ -1,6 +1,7 @@
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { formatInr, getPricingFromProduct } from "../lib/pricing";
 
 function AllCards({ data, onOpenCart }) {
     const { addToCart } = useCart();
@@ -73,14 +74,21 @@ function AllCards({ data, onOpenCart }) {
                         {/* Price and Button */}
                         <div className="flex items-center justify-between mt-4">
                             <div className="flex flex-col">
-                                <span className="text-xl md:text-2xl font-bold text-white">
-                                    ${singleItem.price}
-                                </span>
-                                {singleItem.discountPercentage > 10 && (
-                                    <span className="text-xs text-slate-500 line-through">
-                                        ${(singleItem.price / (1 - singleItem.discountPercentage / 100)).toFixed(2)}
-                                    </span>
-                                )}
+                                {(() => {
+                                    const { marketPrice, offerPrice, discountPct } = getPricingFromProduct(singleItem);
+                                    return (
+                                        <>
+                                            <span className="text-xl md:text-2xl font-bold text-white">
+                                                {formatInr(offerPrice)}
+                                            </span>
+                                            {discountPct > 0 && (
+                                                <span className="text-xs text-slate-500 line-through">
+                                                    {formatInr(marketPrice)}
+                                                </span>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
                             <button 
                                 onClick={(e) => {
