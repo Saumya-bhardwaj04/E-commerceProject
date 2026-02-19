@@ -1,1 +1,8 @@
 node_modules/
+
+# env files (never commit secrets)
+.env
+server/.env
+
+# backend local store
+server/data/

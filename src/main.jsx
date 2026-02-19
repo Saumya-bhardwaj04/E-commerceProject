@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { Toaster } from 'react-hot-toast'
+import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -21,7 +22,9 @@ createRoot(document.getElementById('root')).render(
             }}
         />
         <CartProvider>
-            <App />
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
         </CartProvider>
     </StrictMode>
 )

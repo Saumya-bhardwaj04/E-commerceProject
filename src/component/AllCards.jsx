@@ -1,18 +1,35 @@
 import { useCart } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function AllCards({ data, onOpenCart }) {
     const { addToCart } = useCart();
+    const navigate = useNavigate();
 
     function handleAddToCart(item) {
         addToCart(item);
-        onOpenCart();
+        toast.success("Added to cart");
+        if (onOpenCart) onOpenCart();
+    }
+
+    function openDetails(productId) {
+        navigate(`/product/${productId}`);
     }
     return (
         <div className="mt-8 md:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 w-full max-w-7xl px-4 md:px-6">
             {data.map((singleItem) => (
                 <div
                     key={singleItem.id}
-                    className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openDetails(singleItem.id)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            openDetails(singleItem.id);
+                        }
+                    }}
+                    className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
                 >
                     {/* Image Container */}
                     <div className="relative overflow-hidden aspect-square bg-slate-800">
@@ -66,7 +83,10 @@ function AllCards({ data, onOpenCart }) {
                                 )}
                             </div>
                             <button 
-                                onClick={() => handleAddToCart(singleItem)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAddToCart(singleItem);
+                                }}
                                 className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 active:scale-95"
                             >
                                 Add to Cart

@@ -1,12 +1,86 @@
 import { useCart } from "../context/CartContext";
+import { useState } from "react";
+import CheckoutModal from "./CheckoutModal";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { apiJson } from "../lib/api";
+import { loadRazorpayCheckout } from "../lib/razorpay";
+import { addLocalOrderId } from "../lib/orders";
 
 function Cart({ onClose }) {
     const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount } = useCart();
+    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+    const navigate = useNavigate();
+
     function handleCheckout() {
-        toast.success("Comming Soon! Checkout feature is under development.😅");
-        clearCart();
-        onClose();
+        setIsCheckoutOpen(true);
+    }
+
+    async function handlePay(selectedMethod) {
+        if (!cartItems.length) throw new Error("Cart is empty");
+        if (!Number.isFinite(cartTotal) || cartTotal <= 0) throw new Error("Invalid total");
+
+        const items = cartItems.map((it) => ({
+            id: it.id,
+            title: it.title,
+            price: it.price,
+            quantity: it.quantity,
+            thumbnail: it.thumbnail,
+        }));
+
+        const orderCreate = await apiJson("/api/orders", {
+            method: "POST",
+            body: JSON.stringify({
+                items,
+                total: cartTotal,
+                currency: "INR",
+                preferredMethod: selectedMethod?.type,
+            }),
+        });
+
+        await loadRazorpayCheckout();
+
+        // Close our modal so Razorpay becomes the only overlay.
+        setIsCheckoutOpen(false);
+
+        const options = {
+            key: orderCreate.keyId,
+            amount: orderCreate.amountPaise,
+            currency: orderCreate.currency,
+            name: "Pocket Cart",
+            description: "Order payment",
+            order_id: orderCreate.razorpayOrderId,
+            handler: async (response) => {
+                try {
+                    await apiJson("/api/payments/verify", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            orderId: orderCreate.orderId,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                        }),
+                    });
+
+                    toast.success("Payment successful");
+                    addLocalOrderId(orderCreate.orderId);
+                    clearCart();
+                    onClose();
+                    navigate(`/orders/${orderCreate.orderId}`);
+                } catch (e) {
+                    toast.error(e?.message || "Payment verification failed");
+                }
+            },
+            modal: {
+                ondismiss: () => {
+                    toast("Payment cancelled");
+                },
+            },
+        };
+
+        // Razorpay Checkout handles real UPI & card flows.
+        const rzp = new window.Razorpay(options);
+        rzp.open();
     }
 
     return (
@@ -173,6 +247,14 @@ function Cart({ onClose }) {
                     </div>
                 )}
             </div>
+
+            {isCheckoutOpen && (
+                <CheckoutModal
+                    onClose={() => setIsCheckoutOpen(false)}
+                    onPay={handlePay}
+                    totalAmount={cartTotal}
+                />
+            )}
         </div>
     );
 }
